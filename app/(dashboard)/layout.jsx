@@ -1,4 +1,4 @@
-import SideBar from "@/components/SideBar";
+import SideBar from "@/components/SideBar/SideBar";
 import {FaBarsStaggered} from "react-icons/fa6";
 
 export const metadata = {
