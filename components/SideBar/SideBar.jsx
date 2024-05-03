@@ -18,7 +18,7 @@ const links = [
   {
     id: 3,
     title: "New Tour",
-    href: "/new-tour",
+    href: "/tours/new-tour",
   },
   {
     id: 4,
