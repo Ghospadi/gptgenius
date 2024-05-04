@@ -134,7 +134,7 @@ export const generateUserTokensForId = async (clerkId) => {
   const result = await prisma.token.create({
     data: {
       clerkId,
-      tokens: 1000,
+      tokens: 2500,
     },
   });
 
