@@ -1,8 +1,9 @@
-import {useAuth, UserProfile} from "@clerk/nextjs";
+import {UserProfile} from "@clerk/nextjs";
 import {fetchUserTokensById} from "@/utils/actions";
+import {auth} from "@clerk/nextjs/server";
 
 async function ProfilePage() {
-  const {userId} = useAuth();
+  const {userId} = auth();
   const currentTokens = await fetchUserTokensById(userId);
   return (
     <div className="flex flex-col items-center justify-center mt-[5rem]">
