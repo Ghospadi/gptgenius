@@ -10,12 +10,12 @@ import {
   subtractTokens,
 } from "@/utils/actions";
 import toast from "react-hot-toast";
-import {auth} from "@clerk/nextjs/server";
+import {useAuth} from "@clerk/nextjs";
 
 const NewTour = () => {
   const queryClient = new QueryClient();
 
-  const {userId} = auth();
+  const {userId} = useAuth();
 
   const {mutate, isPending, data: tour} = useMutation({
     mutationFn: async (destination) => {
