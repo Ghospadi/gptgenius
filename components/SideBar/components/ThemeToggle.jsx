@@ -5,22 +5,22 @@ import {IoMoonSharp} from "react-icons/io5";
 import {IoIosSunny} from "react-icons/io";
 
 const themes = {
-  cupcake: "cupcake",
+  nord: "nord",
   night: "night",
 };
 
 const ThemeToggle = ({IconLight, IconDark}) => {
-  const [theme, setTheme] = useState(themes.cupcake);
+  const [theme, setTheme] = useState(themes.nord);
 
   const toggleTheme = () => {
-    const newTheme = theme === themes.cupcake ? themes.night : themes.cupcake;
+    const newTheme = theme === themes.nord ? themes.night : themes.nord;
     document.documentElement.setAttribute("data-theme", newTheme);
     setTheme(newTheme);
   };
 
   return (
     <button onClick={toggleTheme} className="btn btn-sm btn-outline">
-      {theme === themes.cupcake ? <IoMoonSharp className="h-4 w-4"/> : <IoIosSunny className="h-4 w-4"/>}
+      {theme === themes.nord ? <IoMoonSharp className="h-4 w-4"/> : <IoIosSunny className="h-4 w-4"/>}
     </button>
   );
 };

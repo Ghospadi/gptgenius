@@ -2,11 +2,20 @@
 
 import TourInfo from "@/components/NewTour/TourInfo";
 import {QueryClient, useMutation} from "@tanstack/react-query";
-import {createNewTour, generateTourResponse, getExistedTour} from "@/utils/actions";
+import {
+  createNewTour,
+  fetchUserTokensById,
+  generateTourResponse,
+  getExistedTour,
+  subtractTokens,
+} from "@/utils/actions";
 import toast from "react-hot-toast";
+import {auth} from "@clerk/nextjs/server";
 
 const NewTour = () => {
   const queryClient = new QueryClient();
+
+  const {userId} = auth();
 
   const {mutate, isPending, data: tour} = useMutation({
     mutationFn: async (destination) => {
@@ -14,14 +23,26 @@ const NewTour = () => {
       if (existedTour) {
         return existedTour;
       }
-      const newTour = await generateTourResponse(destination);
-      if (newTour) {
-        await createNewTour(newTour);
-        queryClient.invalidateQueries({queryKey: ["tours"]});
-        return newTour;
+
+      const currentTokens = await fetchUserTokensById(userId);
+
+      if (currentTokens < 250) {
+        toast.error("You don't have enough tokens to generate a tour...");
+        return null;
       }
-      toast.error("Failed to generate tour...");
-      return null;
+
+      const newTour = await generateTourResponse(destination);
+      if (!newTour) {
+        toast.error("No tour found for this destination...");
+        return null;
+      }
+
+      await createNewTour(newTour.tour);
+      queryClient.invalidateQueries({queryKey: ["tours"]});
+      const newTokens = await subtractTokens(userId, newTour.tokens);
+      toast.success(`Tour generated successfully! You have ${newTokens} tokens left...`);
+
+      return newTour.tour;
     },
   });
 
@@ -56,7 +77,7 @@ const NewTour = () => {
             placeholder="Enter country"
             className="input input-bordered join-item w-full"
           />
-          <button className="btn btn-primary join-item" type="submit">
+          <button className="btn btn-primary join-item max-sm:w-28" type="submit">
                 Generate Tour
           </button>
         </div>

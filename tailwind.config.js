@@ -6,7 +6,7 @@ module.exports = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   daisyui: {
-    themes: ["cupcake", "night"],
+    themes: ["nord", "night"],
   },
   plugins: [
     require("@tailwindcss/typography"), require("daisyui"),

@@ -2,23 +2,36 @@
 
 import {useState} from "react";
 import {useMutation} from "@tanstack/react-query";
-import {generateChatResponse} from "@/utils/actions";
+import {fetchUserTokensById, generateChatResponse, subtractTokens} from "@/utils/actions";
 import toast from "react-hot-toast";
+import {useAuth} from "@clerk/nextjs";
 
 const Chat = () => {
   const [text, setText] = useState("");
   const [messages, setMessages] = useState([]);
 
+  const {userId} = useAuth();
+
   const {mutate: createMessage, isPending: isChatOpenAiRequestIsPending} = useMutation({
-    mutationFn: (query) => {
-      return generateChatResponse([...messages, query]);
-    },
-    onSuccess: (data) => {
-      if (!data) {
-        toast.error("Failed to send message");
-        return;
+    mutationFn: async (query) => {
+      const currentTokens = await fetchUserTokensById(userId);
+
+      if (currentTokens < 100) {
+        toast.error("You don't have enough tokens to generate a tour...");
+        return null;
       }
-      setMessages((prev) => [...prev, data]);
+
+      const response = await generateChatResponse([...messages, query]);
+
+      if (!response) {
+        toast.error("Failed to send message");
+        return null;
+      }
+
+      setMessages((prev) => [...prev, response.message]);
+
+      const newTokens = await subtractTokens(userId, response.tokens);
+      toast.success(`Message sent successfully! You have ${newTokens} tokens left...`);
     },
   });
 
@@ -48,7 +61,7 @@ const Chat = () => {
           })
         }
         {isChatOpenAiRequestIsPending ? <span className="loading"/> : null}
-        {messages.length === 0 ? <div className={`flex justify-center py-6 -mx-8
+        {messages.length === 0 ? <div className={`flex justify-center max-sm:mt-8 py-6 -mx-8
               px-8 text-xl leading-loose border-b border-base-300 bg-base-300/60`}>How can I help you today?</div> : null}
       </div>
       <form onSubmit={handleSend} className="max-w-5xl pt-12">
